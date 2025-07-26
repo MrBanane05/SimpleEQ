@@ -185,28 +185,28 @@ void SimpleEQAudioProcessor::setStateInformation (const void* data, int sizeInBy
     // whose contents will have been created by the getStateInformation() call.
 }
 
-// Fonction qui retourne l'ensemble des paramètres utilisés par le plugin.
+// Fonction qui retourne l'ensemble des paramÃ¨tres utilisÃ©s par le plugin.
 
 juce::AudioProcessorValueTreeState::ParameterLayout
 SimpleEQAudioProcessor::createParameterLayout()
 {
-    // Création d’un objet qui va contenir tous les paramètres du plugin
+    // CrÃ©ation dâ€™un objet qui va contenir tous les paramÃ¨tres du plugin
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
 
-    // ========== PARAMÈTRE 1 : LowCut Frequency ==========
+    // ========== PARAMÃˆTRE 1 : LowCut Frequency ==========
     layout.add(std::make_unique<juce::AudioParameterFloat>(
-        "LowCut Freq",                    // ID interne utilisé pour identifier le paramètre
+        "LowCut Freq",                    // ID interne utilisÃ© pour identifier le paramÃ¨tre
         "LowCut Freq",                    // Nom visible dans l'interface ou automation
         juce::NormalisableRange<float>(
             20.f,                         // Valeur minimale (20 Hz)
             20000.f,                      // Valeur maximale (20 000 Hz)
-            1.f,                          // Pas (incrément par clic ou molette)
-            1.f                           // Skew factor (1 = linéaire ; pas de ressenti "log")
+            1.f,                          // Pas (incrÃ©ment par clic ou molette)
+            1.f                           // Skew factor (1 = linÃ©aire ; pas de ressenti "log")
         ),
-        20.f                              // Valeur par défaut
+        20.f                              // Valeur par dÃ©faut
     ));
 
-    // ========== PARAMÈTRE 2 : HighCut Frequency ==========
+    // ========== PARAMÃˆTRE 2 : HighCut Frequency ==========
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "HighCut Freq",
         "HighCut Freq",
@@ -215,10 +215,10 @@ SimpleEQAudioProcessor::createParameterLayout()
             1.f,
             1.f
         ), // Idem que LowCut
-        20000.f                           // Valeur par défaut (maximum)
+        20000.f                           // Valeur par dÃ©faut (maximum)
     ));
 
-    // ========== PARAMÈTRE 3 : Peak Frequency ==========
+    // ========== PARAMÃˆTRE 3 : Peak Frequency ==========
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "Peak Freq",
         "Peak Freq",
@@ -226,52 +226,52 @@ SimpleEQAudioProcessor::createParameterLayout()
             20000.f,
             1.f,
             1.f
-        ), // Fréquence centrale du filtre "bell"
-        750.f                              // Valeur par défaut : 750 Hz
+        ), // FrÃ©quence centrale du filtre "bell"
+        750.f                              // Valeur par dÃ©faut : 750 Hz
     ));
 
-    // ========== PARAMÈTRE 4 : Peak Gain ==========
+    // ========== PARAMÃˆTRE 4 : Peak Gain ==========
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "Peak gain",
         "Peak gain",
         juce::NormalisableRange<float>(
-            -24.f,                        // Gain minimum (atténuation)
+            -24.f,                        // Gain minimum (attÃ©nuation)
             24.f,                         // Gain maximum (amplification)
             0.5f,                         // Pas de 0.5 dB
-            1.f                           // Skew = linéaire (ce qu'on veut pour des dB)
+            1.f                           // Skew = linÃ©aire (ce qu'on veut pour des dB)
         ),
-        0.0f                              // Valeur par défaut : 0 dB (aucune modification)
+        0.0f                              // Valeur par dÃ©faut : 0 dB (aucune modification)
     ));
 
-    // ========== PARAMÈTRE 5 : Peak Quality (facteur Q) ==========
+    // ========== PARAMÃˆTRE 5 : Peak Quality (facteur Q) ==========
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "Peak Quality",
         "Peak Quality",
         juce::NormalisableRange<float>(
-            0.1f,                         // Q minimum (très large bande)
-            10.f,                         // Q maximum (bande très étroite)
+            0.1f,                         // Q minimum (trÃ¨s large bande)
+            10.f,                         // Q maximum (bande trÃ¨s Ã©troite)
             0.05f,                        // Pas d'ajustement fin
-            1.f                           // Skew linéaire (convient bien ici)
+            1.f                           // Skew linÃ©aire (convient bien ici)
         ),
-        1.0f                              // Valeur par défaut : Q = 1.0 (standard)
+        1.0f                              // Valeur par dÃ©faut : Q = 1.0 (standard)
     ));
 
     juce::StringArray StringArray;
     for (int i = 0; i < 4; i++) {
         juce::String str;
 		str << (12 + i*12);               // 12, 24, 36, 48
-        str << " dB/oct";                 // Ajoute l'unité
+        str << " dB/oct";                 // Ajoute l'unitÃ©
         
-        // Ajoute la chaîne de caractères à la liste
-		// Ajoute la chaîne formatée à l'array
+        // Ajoute la chaÃ®ne de caractÃ¨res Ã  la liste
+		// Ajoute la chaÃ®ne formatÃ©e Ã  l'array
 		StringArray.add(str);
     }
 
     layout.add(std::make_unique<juce::AudioParameterChoice>(
-        "LowCut Slope",                 // ID interne du paramètre
-        "LowCut Slope",                 // Nom affiché dans l'interface
+        "LowCut Slope",                 // ID interne du paramÃ¨tre
+        "LowCut Slope",                 // Nom affichÃ© dans l'interface
         StringArray,                    // Liste des options (StringArray)
-        0                               // Valeur par défaut : index 0 = "12 dB/oct"
+        0                               // Valeur par dÃ©faut : index 0 = "12 dB/oct"
     ));
 
     layout.add(std::make_unique<juce::AudioParameterChoice>(
@@ -283,7 +283,7 @@ SimpleEQAudioProcessor::createParameterLayout()
 
 
 
-    // Retourne la structure avec tous les paramètres ajoutés
+    // Retourne la structure avec tous les paramÃ¨tres ajoutÃ©s
     return layout;
 }
 
