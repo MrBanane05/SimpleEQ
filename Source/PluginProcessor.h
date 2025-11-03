@@ -11,6 +11,16 @@
 #include <JuceHeader.h>
 
 
+// Structure pour stocker les réglages de la chaîne d'effets
+struct ChainSetting {
+	float peakFreq{ 0 }, peakGainInDecibels{ 0 }, peakQuality{ 1.f };
+    float lowCutFreq{ 0 }, highCutFreq{ 0 };
+	float lowCutSlope{ 0 }, highCutSlope{ 0 };    
+};
+
+// Fonction pour obtenir les réglages de la chaîne à partir de l'état des sliders/paramètres
+ChainSetting getChainSettings(juce::AudioProcessorValueTreeState& apvts);
+
 class SimpleEQAudioProcessor  : public juce::AudioProcessor
 {
 public:
@@ -98,6 +108,13 @@ private:
 	// Instances des chaînes de traitement pour les canaux gauche et droit
 	MonoChain leftChain, rightChain;
 
+	// Enumération pour les positions des filtres dans la chaîne
+    enum ChainPositions
+    {
+        LowCut,
+        Peak,
+        HighCut
+	};
     // Empêche la copie et détecte les fuites de mémoire
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleEQAudioProcessor)
 };

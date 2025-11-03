@@ -105,9 +105,20 @@ void SimpleEQAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     spec.sampleRate = sampleRate;                   // Fréquence d’échantillonnage du projet (ex: 44100 Hz)
 
     leftChain.prepare(spec);                        // Prépare la chaîne DSP du canal gauche avec les specs données
-
     rightChain.prepare(spec);                       // Prépare la chaîne DSP du canal droit avec les mêmes specs
 
+	auto chainSettings = getChainSettings(apvts); // Récupère les paramètres actuels depuis l'APVTS
+
+	// Configure le filtre en cloche (peak filter) avec les paramètres récupérés
+    auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate,
+                                                                                chainSettings.peakFreq,
+                                                                                chainSettings.peakQuality,
+                                                                                juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
+	);
+
+	// Applique les coefficients calculés aux filtres des deux canaux
+	*leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;   // Applique les coefficients au filtre du canal gauche
+	*rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;  // Applique les coefficients au filtre du canal droit
 }
 
 void SimpleEQAudioProcessor::releaseResources()
@@ -157,6 +168,19 @@ void SimpleEQAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
+    auto chainSettings = getChainSettings(apvts); // Récupère les paramètres actuels depuis l'APVTS
+
+    // Configure le filtre en cloche (peak filter) avec les paramètres récupérés
+    auto peakCoefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(getSampleRate(),
+        chainSettings.peakFreq,
+        chainSettings.peakQuality,
+        juce::Decibels::decibelsToGain(chainSettings.peakGainInDecibels)
+    );
+
+    // Applique les coefficients calculés aux filtres des deux canaux
+    *leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;   // Applique les coefficients au filtre du canal gauche
+    *rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficients;  // Applique les coefficients au filtre du canal droit
+
 	juce::dsp::AudioBlock<float> block(buffer);
 
 	auto leftBlock = block.getSingleChannelBlock(0);    // Bloc audio pour le canal gauche
@@ -196,8 +220,24 @@ void SimpleEQAudioProcessor::setStateInformation (const void* data, int sizeInBy
     // whose contents will have been created by the getStateInformation() call.
 }
 
-// Fonction qui retourne l'ensemble des paramètres utilisés par le plugin.
+// Fonction qui récupère les paramètres depuis l'APVTS et les stocke dans une structure ChainSetting.
+ChainSetting getChainSettings(juce::AudioProcessorValueTreeState& apvts)
+{
+    // Création d'une instance de ChainSetting pour stocker les paramètres
+	ChainSetting settings;  
+	//récupération des valeurs des paramètres depuis les sliders de l'interface utilisateur via l'APVTS
+    settings.peakFreq = apvts.getRawParameterValue("Peak Freq")->load();
+    settings.peakGainInDecibels = apvts.getRawParameterValue("Peak gain")->load();
+    settings.peakQuality = apvts.getRawParameterValue("Peak Quality")->load();
+    settings.lowCutFreq =  apvts.getRawParameterValue("LowCut Freq")->load();
+    settings.highCutFreq = apvts.getRawParameterValue("HighCut Freq")->load();
+    settings.lowCutSlope = apvts.getRawParameterValue("LowCut Slope")->load();
+    settings.highCutSlope = apvts.getRawParameterValue("HighCut Slope")->load();
+    return settings;
+}
 
+
+// Fonction qui retourne l'ensemble des paramètres utilisés par le plugin.
 juce::AudioProcessorValueTreeState::ParameterLayout
 SimpleEQAudioProcessor::createParameterLayout()
 {
