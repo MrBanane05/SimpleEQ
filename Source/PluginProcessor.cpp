@@ -263,7 +263,7 @@ SimpleEQAudioProcessor::createParameterLayout()
         "HighCut Freq",
         juce::NormalisableRange<float>(20.f,
             20000.f,
-            1.f,
+            0,25.f,
             1.f
         ), // Idem que LowCut
         20000.f                           // Valeur par défaut (maximum)
@@ -275,7 +275,7 @@ SimpleEQAudioProcessor::createParameterLayout()
         "Peak Freq",
         juce::NormalisableRange<float>(20.f,
             20000.f,
-            1.f,
+            0,25.f,
             1.f
         ), // Fréquence centrale du filtre "bell"
         750.f                              // Valeur par défaut : 750 Hz
@@ -288,7 +288,7 @@ SimpleEQAudioProcessor::createParameterLayout()
         juce::NormalisableRange<float>(
             -24.f,                        // Gain minimum (atténuation)
             24.f,                         // Gain maximum (amplification)
-            0.5f,                         // Pas de 0.5 dB
+            0,25.f,                         // Pas de 0.25 dB
             1.f                           // Skew = linéaire (ce qu'on veut pour des dB)
         ),
         0.0f                              // Valeur par défaut : 0 dB (aucune modification)
